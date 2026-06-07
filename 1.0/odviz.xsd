@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ODViz - Open Data Visualization
+  XML Schema Definition (XSD) for ODViz format version 1.0
+  
+  This schema defines the structure for embedding tabular data and their
+  visual representations within SVG documents. It supports any visualization
+  type including statistical charts, maps, network graphs, trees, flow diagrams,
+  and more. The format is designed to be simple, readable, and easy to process,
+  while maintaining bidirectional references between data and visual elements.
+  
+  Namespace: https://odviz.org/1.0/
+  Prefix: v (recommended) or any other alias
+  
+  Usage in SVG:
+  <svg xmlns="http://www.w3.org/2000/svg"
+       xmlns:v="https://odviz.org/1.0/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="https://odviz.org/1.0/ odviz.xsd">
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:v="https://odviz.org/1.0/"
+           targetNamespace="https://odviz.org/1.0/"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+  <!-- ======================================================== -->
+  <!-- ROOT ELEMENT: table                                      -->
+  <!-- ======================================================== -->
+  <xs:element name="table">
+    <xs:annotation>
+      <xs:documentation>
+        Root element for an ODViz data table.
+        Contains data rows and optional metadata.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="columns" type="v:ColumnsType" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Detailed column definitions with data types and constraints.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="statistics" type="v:StatisticsType" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Pre-calculated statistics for performance optimization.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="relations" type="v:RelationsType" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Foreign key relationships between tables.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="visual-hints" type="v:VisualHintsType" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Rendering suggestions for visualizations.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="history" type="v:HistoryType" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Change history of the table.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="validity" type="v:ValidityType" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Temporal validity period of the data.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="quality" type="v:QualityType" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>Data quality indicators.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="row" type="v:RowType" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>Data row containing CSV values.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+
+      <!-- Table attributes -->
+      <xs:attribute name="name" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Unique table identifier.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="description" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Human-readable description of the table.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="version" type="xs:string" default="1.0">
+        <xs:annotation>
+          <xs:documentation>Version number of the table structure.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="created" type="xs:dateTime" use="optional">
+        <xs:annotation>
+          <xs:documentation>Creation timestamp (ISO 8601).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="updated" type="xs:dateTime" use="optional">
+        <xs:annotation>
+          <xs:documentation>Last update timestamp (ISO 8601).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="source" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Data source (e.g., system name, database).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="author" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Creator of the table.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="department" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Responsible department or team.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="license" type="xs:string" default="CC-BY-4.0">
+        <xs:annotation>
+          <xs:documentation>Usage license for the data.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="language" type="xs:language" default="en">
+        <xs:annotation>
+          <xs:documentation>Language code for the data content.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="timezone" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>IANA timezone for date/time values.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="currency" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>ISO currency code (e.g., USD, EUR, MXN).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="unit" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Default unit of measurement.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="decimalSeparator" type="xs:string" default=".">
+        <xs:annotation>
+          <xs:documentation>Decimal separator character.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="thousandSeparator" type="xs:string" default=",">
+        <xs:annotation>
+          <xs:documentation>Thousands separator character.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="nullValue" type="xs:string" default="">
+        <xs:annotation>
+          <xs:documentation>String representation of null values.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="totalRows" type="xs:nonNegativeInteger" use="optional">
+        <xs:annotation>
+          <xs:documentation>Total number of rows in the table.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="columns" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Comma-separated list of column names (CSV header).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="primaryKey" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Column name that serves as primary key.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ======================================================== -->
+  <!-- TYPE: RowType                                            -->
+  <!-- ======================================================== -->
+  <xs:complexType name="RowType">
+    <xs:annotation>
+      <xs:documentation>
+        A data row containing CSV values.
+        The content is a comma-separated string matching the columns attribute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="id" type="xs:ID" use="required">
+          <xs:annotation>
+            <xs:documentation>Unique row identifier. Referenced by shapes via href.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="hrefs" type="v:IdListType" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Comma-separated list of shape IDs that represent this row.
+              Enables bidirectional linking from data to visual elements.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="xml:id" type="xs:ID" use="optional">
+          <xs:annotation>
+            <xs:documentation>XML standard identifier (alternative to id).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="selected" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>Indicates if the row is selected by default.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="color" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Suggested color for visual representation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Pattern for comma-separated ID lists (hrefs attribute) -->
+  <xs:simpleType name="IdListType">
+    <xs:annotation>
+      <xs:documentation>Comma-separated list of valid XML IDs.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z_][a-zA-Z0-9_-]*)(\s*,\s*[a-zA-Z_][a-zA-Z0-9_-]*)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ======================================================== -->
+  <!-- TYPE: ColumnsType                                        -->
+  <!-- ======================================================== -->
+  <xs:complexType name="ColumnsType">
+    <xs:annotation>
+      <xs:documentation>Detailed column definitions with data types and constraints.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="column" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>Column identifier matching columns attribute.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="type" type="v:ColumnTypeEnum" use="required">
+            <xs:annotation>
+              <xs:documentation>Data type of the column.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="description" type="xs:string" use="optional">
+            <xs:annotation>
+              <xs:documentation>Human-readable description of the column.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="unit" type="xs:string" use="optional">
+            <xs:annotation>
+              <xs:documentation>Unit of measurement for numeric values.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="enumeration" type="xs:string" use="optional">
+            <xs:annotation>
+              <xs:documentation>Comma-separated list of allowed values.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="min" type="xs:double" use="optional">
+            <xs:annotation>
+              <xs:documentation>Minimum allowed value for numeric columns.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="max" type="xs:double" use="optional">
+            <xs:annotation>
+              <xs:documentation>Maximum allowed value for numeric columns.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="required" type="xs:boolean" default="false">
+            <xs:annotation>
+              <xs:documentation>Whether the column must have a value in every row.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="formula" type="xs:string" use="optional">
+            <xs:annotation>
+              <xs:documentation>Expression for calculated columns.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="readonly" type="xs:boolean" default="false">
+            <xs:annotation>
+              <xs:documentation>Whether the column is read-only (calculated).</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Column data types -->
+  <xs:simpleType name="ColumnTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="string"/>
+      <xs:enumeration value="integer"/>
+      <xs:enumeration value="decimal"/>
+      <xs:enumeration value="date"/>
+      <xs:enumeration value="datetime"/>
+      <xs:enumeration value="boolean"/>
+      <xs:enumeration value="percentage"/>
+      <xs:enumeration value="currency"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ======================================================== -->
+  <!-- TYPE: StatisticsType                                     -->
+  <!-- ======================================================== -->
+  <xs:complexType name="StatisticsType">
+    <xs:annotation>
+      <xs:documentation>Pre-calculated statistics for performance optimization.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="total" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="column" type="xs:string" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="average" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="column" type="xs:string" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="min" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="column" type="xs:string" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="max" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="column" type="xs:string" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="sum" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="xs:string">
+                    <xs:attribute name="key" type="xs:string" use="required"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="column" type="xs:string" use="required"/>
+          <xs:attribute name="groupBy" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ======================================================== -->
+  <!-- TYPE: RelationsType                                      -->
+  <!-- ======================================================== -->
+  <xs:complexType name="RelationsType">
+    <xs:annotation>
+      <xs:documentation>Foreign key relationships between tables.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="relation" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="target" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>Name of the referenced table.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="localKey" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>Column name in the current table.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="foreignKey" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>Column name in the target table.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="type" type="v:JoinTypeEnum" default="inner">
+            <xs:annotation>
+              <xs:documentation>SQL join type for the relationship.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Join types -->
+  <xs:simpleType name="JoinTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="inner"/>
+      <xs:enumeration value="left"/>
+      <xs:enumeration value="right"/>
+      <xs:enumeration value="full"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ======================================================== -->
+  <!-- TYPE: VisualHintsType                                    -->
+  <!-- ======================================================== -->
+  <xs:complexType name="VisualHintsType">
+    <xs:annotation>
+      <xs:documentation>Rendering suggestions for visualizations.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="color" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="column" type="xs:string" use="required"/>
+          <xs:attribute name="gradient" type="xs:string" use="required"/>
+          <xs:attribute name="thresholds" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="format" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="column" type="xs:string" use="required"/>
+          <xs:attribute name="prefix" type="xs:string" use="optional"/>
+          <xs:attribute name="suffix" type="xs:string" use="optional"/>
+          <xs:attribute name="decimalPlaces" type="xs:nonNegativeInteger" default="0"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="bar-chart" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="column" type="xs:string" use="required"/>
+          <xs:attribute name="maxBarWidth" type="xs:positiveInteger" default="100"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ======================================================== -->
+  <!-- TYPE: HistoryType                                        -->
+  <!-- ======================================================== -->
+  <xs:complexType name="HistoryType">
+    <xs:annotation>
+      <xs:documentation>Change history of the table.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="change" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="date" type="xs:dateTime" use="required"/>
+              <xs:attribute name="user" type="xs:string" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ======================================================== -->
+  <!-- TYPE: ValidityType                                       -->
+  <!-- ======================================================== -->
+  <xs:complexType name="ValidityType">
+    <xs:annotation>
+      <xs:documentation>Temporal validity period of the data.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="validFrom" type="xs:date" minOccurs="0"/>
+      <xs:element name="validTo" type="xs:date" minOccurs="0"/>
+      <xs:element name="refreshInterval" type="xs:duration" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ======================================================== -->
+  <!-- TYPE: QualityType                                        -->
+  <!-- ======================================================== -->
+  <xs:complexType name="QualityType">
+    <xs:annotation>
+      <xs:documentation>Data quality indicators.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="completeness" type="xs:double" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Fraction of non-null values (0.0 to 1.0).</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="accuracy" type="v:AccuracyEnum" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Data accuracy level.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lastValidation" type="xs:dateTime" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Timestamp of last validation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Accuracy levels -->
+  <xs:simpleType name="AccuracyEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="low"/>
+      <xs:enumeration value="medium"/>
+      <xs:enumeration value="high"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
